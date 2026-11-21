@@ -143,7 +143,7 @@ SMALL = [
          body="146 aboard; no injuries.", src="AP", scene="plane",
          ban="DAVAO: 146 SAFE", region="Asia"),
     dict(n=7, tag="MARKETS \u00b7 CRYPTO", head="Bitcoin slips below $59,000",
-         body="$58,983 early Saturday.", src="Top 1 stat", scene="coin",
+         body="$58,983 early Saturday.", src="CoinGecko", scene="coin",
          ban="BITCOIN: $58,983", region="Global"),
     dict(n=8, tag="LAS VEGAS \u00b7 F1", head="Russell fastest in final practice",
          body="1:34.041 in FP3.", src="F1", scene="racecar",
@@ -203,53 +203,120 @@ STATS = [
     ("$58,983", "bitcoin early Saturday"),
 ]
 
-# Region counts recomputed from this story set; they sum to 36.
+# DATE CHECK: 16 items the paper deliberately left out, as a checklist
+# (the format top 3 uses — readable in 2 seconds). Each item names the day
+# it actually belongs to; the four Thursday items are NOT lumped under
+# "Friday's news" the way a paragraph would. Down-columns, 3 columns.
+DC_ITEMS = [
+    ("Poland missiles land", "Fri 20 Nov"),
+    ("Denmark \u2018assassination plot\u2019", "Fri 20 Nov"),
+    ("UK\u2013EU reset deal", "Fri 20 Nov"),
+    ("ICJ Myanmar ruling", "Thu 19 Nov"),
+    ("Shenzhen summit", "Thu 19 Nov"),
+    ("Anthropic $83-a-share IPO", "Thu 19 Nov"),
+    ("Akvan landfall", "Fri 20 Nov"),
+    ("Kyiv bridges hit", "Fri 20 Nov"),
+    ("US clears 900K AI chips", "Thu 19 Nov"),
+    ("India H5N1 vaccine", "Fri 20 Nov"),
+    ("Pete Rose pardon", "Fri 20 Nov"),
+    ("Mongolia president quits", "Fri 20 Nov"),
+    ("GTA VI", "Fri 20 Nov"),
+    ("Houthi workshops claim", "disputed"),
+    ("BepiColombo orbit", "Sat 19:24 CET, not yet"),
+    ("Final COP31 text", "not yet"),
+]
 REGIONS = [("Europe", 9, (31, 58, 95)), ("Asia", 7, (163, 22, 33)),
            ("Middle East", 6, (161, 98, 7)), ("Africa", 1, (14, 107, 107)),
            ("Americas", 8, (107, 33, 168)), ("Oceania", 2, (46, 125, 50)),
            ("Global", 3, (96, 94, 88))]
 
 # Map pins for stories 1-6, 8-11, 13. dx,dy = display offset in px (a leader
-# line is drawn back to the true position); used where pins would collide.
-PINS = {1: (30.7, 36.9, 0, 12), 2: (46.7, 24.7, 0, 0), 3: (-75.9, -11.0, 0, 0),
-        4: (21.0, 52.2, 8, -8), 5: (33.4, 47.9, 10, -6), 6: (125.6, 7.1, 0, 0),
-        8: (-115.1, 36.2, 0, 0), 9: (174.8, -41.3, 0, 0), 10: (127.3, 36.5, 0, 0),
-        11: (4.4, 50.8, -8, -10), 13: (7.7, 45.1, -10, 8)}
+# line is drawn back to the true position). Europe pins 4, 5, 11, 13 and the
+# Middle-East pins 1, 2 are spread so no two displayed pins sit closer than
+# ~28 px (pin diameter is 14).
+PINS = {1: (30.7, 36.9, -2, 14), 2: (46.7, 24.7, 2, 16), 3: (-75.9, -11.0, 0, 0),
+        4: (21.0, 52.2, 18, -14), 5: (33.4, 47.9, 20, 6), 6: (125.6, 7.1, 0, 0),
+        8: (-115.1, 36.2, 0, 0), 9: (174.8, -41.3, -8, 0), 10: (127.3, 36.5, 0, 0),
+        11: (4.4, 50.8, -16, -14), 13: (7.7, 45.1, -20, 10)}
 # pins 7 (Bitcoin) and 12 (Mercury) are off-map: drawn in the corner box.
 
 
 # ---------------------------------------------------------------- lead pictures
 def draw_summit(d, x, y, w, h):
-    """COP31: a globe over a conference hall at dusk, flags along the base."""
+    """COP31: a globe over a conference hall at dusk, flags along the base.
+    Richer than a bare globe: the globe carries a lat/long grid and cloud
+    wisps, a crescent moon hangs top-left, the hall shows two rows of lit
+    windows with delegate silhouettes and a central podium."""
     d.rectangle([x, y, x + w, y + h], fill=(38, 74, 110))
     for fx, fy in [(0.06, 0.10), (0.16, 0.05), (0.28, 0.12), (0.40, 0.06),
                    (0.52, 0.11), (0.64, 0.05), (0.76, 0.10), (0.88, 0.06),
                    (0.22, 0.18), (0.58, 0.16), (0.84, 0.15)]:
         sx, sy = x + fx * w, y + fy * h
         d.ellipse([sx - 1, sy - 1, sx + 1, sy + 1], fill=(220, 220, 200))
-    # the globe, centre-left
+    # crescent moon, top-left
+    mx0, my0 = x + 14, y + 10
+    d.ellipse([mx0, my0, mx0 + 20, my0 + 20], fill=(240, 230, 180))
+    d.ellipse([mx0 + 8, my0 - 2, mx0 + 26, my0 + 18], fill=(38, 74, 110))
+    # birds
+    for bx, by in [(0.70, 0.10), (0.76, 0.14), (0.64, 0.16)]:
+        px, py = x + bx * w, y + by * h
+        d.line([(px - 5, py), (px, py - 3), (px + 5, py)], fill=(20, 30, 48),
+               width=2)
+    # the globe, centre-left, with a lat/long grid and cloud wisps
     cx, cy, r = x + int(w * 0.38), y + int(h * 0.44), 52
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(46, 125, 190),
               outline=(20, 60, 110), width=3)
     d.ellipse([cx - 30, cy - 26, cx - 6, cy - 2], fill=(90, 180, 110))
     d.ellipse([cx + 2, cy + 6, cx + 28, cy + 30], fill=(90, 180, 110))
     d.ellipse([cx + 18, cy - 30, cx + 34, cy - 8], fill=(90, 180, 110))
+    d.ellipse([cx - 26, cy + 14, cx - 8, cy + 30], fill=(90, 180, 110))
+    # grid: equator + two meridians clipped to the disc
+    d.line([(cx - r + 4, cy), (cx + r - 4, cy)], fill=(120, 180, 220), width=1)
+    d.line([(cx - r + 4, cy - 18), (cx + r - 4, cy - 18)],
+           fill=(120, 180, 220), width=1)
+    d.line([(cx - r + 4, cy + 18), (cx + r - 4, cy + 18)],
+           fill=(120, 180, 220), width=1)
+    d.arc([cx - r // 2, cy - r, cx + r // 2, cy + r], 270, 90,
+          fill=(120, 180, 220), width=1)
+    d.arc([cx - r // 2, cy - r, cx + r // 2, cy + r], 90, 270,
+          fill=(120, 180, 220), width=1)
     d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255), width=1)
+    # cloud wisps drifting past the globe
+    for cwx, cwy, cwr in [(0.62, 0.30, 14), (0.68, 0.34, 10), (0.10, 0.62, 12)]:
+        px, py = x + cwx * w, y + cwy * h
+        d.ellipse([px - cwr, py - 4, px + cwr, py + 4], fill=(210, 220, 235))
     # sun low on the right
     d.ellipse([x + w - 52, y + 14, x + w - 20, y + 46], fill=(255, 200, 60))
-    # conference hall roofline along the bottom
+    # conference hall roofline along the bottom, two rows of lit windows
     d.rectangle([x, y + h - 34, x + w, y + h], fill=(20, 30, 48))
     d.polygon([(x, y + h - 34), (x + w // 2, y + h - 52), (x + w, y + h - 34)],
               fill=(28, 42, 66))
     for fx in range(0, 10):
         px = x + 12 + fx * 30
         d.rectangle([px, y + h - 26, px + 14, y + h - 8], fill=(255, 214, 120))
-    # flags in a row
+        # delegate silhouette in every other window
+        if fx % 2 == 0:
+            d.ellipse([px + 4, y + h - 24, px + 10, y + h - 18],
+                      fill=(30, 25, 20))
+            d.rectangle([px + 3, y + h - 18, px + 11, y + h - 12],
+                        fill=(30, 25, 20))
+    # upper window row
+    for fx in range(0, 9):
+        px = x + 24 + fx * 32
+        d.rectangle([px, y + h - 48, px + 12, y + h - 38], fill=(255, 214, 120))
+    # podium with a speaker, centre foreground
+    d.rectangle([x + w // 2 - 12, y + h - 30, x + w // 2 + 12, y + h - 8],
+                fill=(12, 18, 30))
+    d.rectangle([x + w // 2 - 16, y + h - 32, x + w // 2 + 16, y + h - 30],
+                fill=(120, 90, 40))
+    d.ellipse([x + w // 2 - 4, y + h - 42, x + w // 2 + 4, y + h - 34],
+              fill=(30, 25, 20))
+    # flags in a row (8)
     for i, col in enumerate([RED, (0, 51, 153), (0, 128, 0), (255, 200, 60),
-                             (120, 60, 30), TEAL]):
-        fx = x + 14 + i * 26
+                             (120, 60, 30), TEAL, (200, 30, 90), (90, 90, 160)]):
+        fx = x + 10 + i * 24
         d.line([(fx, y + h - 34), (fx, y + h - 52)], fill=(200, 200, 200), width=2)
-        d.polygon([(fx, y + h - 52), (fx + 18, y + h - 48), (fx, y + h - 44)],
+        d.polygon([(fx, y + h - 52), (fx + 16, y + h - 48), (fx, y + h - 44)],
                   fill=col)
 
 
@@ -429,16 +496,57 @@ def scene_racecar(d, x, y, w, h):
 
 
 def scene_cricket(d, x, y, w, h):
-    d.rectangle([x, y, x + w, y + h], fill=(120, 180, 90))
-    d.rectangle([x + w // 2 - 14, y + 6, x + w // 2 + 14, y + h - 8],
-                fill=(220, 200, 150))
-    for sx in [x + w // 2 - 6, x + w // 2, x + w // 2 + 6]:
-        d.line([(sx, y + 10), (sx, y + 20)], fill=(240, 220, 120), width=2)
-    # batsman silhouette
-    d.rectangle([x + 24, y + 14, x + 34, y + h - 14], fill=(190, 150, 90))
-    d.rectangle([x + 27, y + 6, x + 31, y + 14], fill=(120, 90, 50))
-    d.ellipse([x + w - 30, y + h - 24, x + w - 18, y + h - 12], fill=RED)
-    d.text((x + w - 56, y + 4), "124*", font=sans_b(14), fill=RED)
+    """Rahul 124*: a batsman in full kit at the crease — helmet, pads, bat
+    meeting the ball — with stumps behind and a fielder in the deep."""
+    # outfield with mowing stripes
+    d.rectangle([x, y, x + w, y + h], fill=(110, 170, 80))
+    for sy in range(y, y + h, 10):
+        if (sy // 10) % 2 == 0:
+            d.rectangle([x, sy, x + w, sy + 10], fill=(98, 156, 70))
+    # pitch strip with crease lines
+    d.rectangle([x + 66, y + 4, x + 118, y + h - 4], fill=(220, 200, 150))
+    d.line([(x + 66, y + 10), (x + 118, y + 10)], fill=(255, 255, 255), width=1)
+    d.line([(x + 66, y + h - 10), (x + 118, y + h - 10)], fill=(255, 255, 255),
+           width=1)
+    # stumps + bails
+    for sx in [x + 74, x + 79, x + 84]:
+        d.line([(sx, y + 12), (sx, y + 22)], fill=(240, 220, 120), width=2)
+    d.line([(x + 74, y + 11), (x + 86, y + 11)], fill=(240, 220, 120), width=2)
+    # fielder in the deep, left
+    d.ellipse([x + 22, y + 26, x + 28, y + 32], fill=(30, 60, 30))
+    d.rectangle([x + 21, y + 32, x + 29, y + 44], fill=(30, 60, 30))
+    d.rectangle([x + 22, y + 44, x + 25, y + h - 4], fill=(20, 40, 20))
+    d.rectangle([x + 26, y + 44, x + 29, y + h - 4], fill=(20, 40, 20))
+    # batsman: helmet + head
+    d.ellipse([x + 96, y + 8, x + 106, y + 18], fill=(222, 184, 150))
+    d.arc([x + 96, y + 8, x + 106, y + 18], 180, 360, fill=(20, 40, 90), width=3)
+    d.rectangle([x + 96, y + 12, x + 100, y + 18], fill=(20, 40, 90))
+    # torso (white shirt), leaning over the ball
+    d.polygon([(x + 94, y + 18), (x + 106, y + 18), (x + 110, y + 32),
+               (x + 98, y + 32)], fill=(250, 250, 250),
+              outline=(180, 180, 180))
+    # arms reaching down to the bat
+    d.line([(x + 106, y + 24), (x + 118, y + 38)], fill=(222, 184, 150), width=3)
+    # pads on both legs
+    d.rectangle([x + 98, y + 32, x + 104, y + 46], fill=(245, 245, 245),
+                outline=(180, 180, 180))
+    d.rectangle([x + 105, y + 32, x + 111, y + 46], fill=(245, 245, 245),
+                outline=(180, 180, 180))
+    # shoes
+    d.rectangle([x + 97, y + 46, x + 105, y + h - 3], fill=(40, 40, 40))
+    d.rectangle([x + 106, y + 46, x + 114, y + h - 3], fill=(40, 40, 40))
+    # bat, angled down to the ball
+    d.line([(x + 118, y + 36), (x + 132, y + h - 6)], fill=(214, 182, 140),
+           width=5)
+    d.line([(x + 118, y + 36), (x + 132, y + h - 6)], fill=(150, 110, 60),
+           width=1)
+    # red ball just past the bat
+    d.ellipse([x + 134, y + h - 12, x + 142, y + h - 4], fill=RED)
+    d.arc([x + 134, y + h - 12, x + 142, y + h - 4], 200, 340,
+          fill=(255, 255, 255), width=1)
+    # score badge, top-right
+    d.rectangle([x + w - 42, y + 3, x + w - 4, y + 16], fill=RED)
+    d.text((x + w - 38, y + 4), "124*", font=sans_b(11), fill=(255, 255, 255))
 
 
 def scene_train(d, x, y, w, h):
@@ -463,21 +571,30 @@ def scene_train(d, x, y, w, h):
 
 
 def scene_eushield(d, x, y, w, h):
+    """EU aid: a large blue shield ringed with gold stars, an aid crate
+    beside it, drones overhead. The "€1bn" figure lives in the red banner
+    label above the scene — no cramped text inside the shield."""
     d.rectangle([x, y, x + w, y + h], fill=(232, 236, 244))
-    # shield
-    cx, cy = x + w // 2, y + h // 2 - 2
-    d.polygon([(cx - 26, cy - 18), (cx + 26, cy - 18), (cx + 26, cy + 6),
-               (cx, cy + 22), (cx - 26, cy + 6)], fill=(0, 51, 153),
+    # large shield, stars only
+    cx, cy = x + int(w * 0.34), y + h // 2
+    d.polygon([(cx - 30, cy - 20), (cx + 30, cy - 20), (cx + 30, cy + 4),
+               (cx, cy + 24), (cx - 30, cy + 4)], fill=(0, 51, 153),
               outline=(255, 210, 0), width=2)
     for k in range(12):
         a = k * math.pi / 6
-        d.ellipse([cx + 13 * math.cos(a) - 1.5, cy - 2 + 13 * math.sin(a) - 1.5,
-                   cx + 13 * math.cos(a) + 1.5, cy - 2 + 13 * math.sin(a) + 1.5],
+        d.ellipse([cx + 15 * math.cos(a) - 2, cy - 4 + 15 * math.sin(a) - 2,
+                   cx + 15 * math.cos(a) + 2, cy - 4 + 15 * math.sin(a) + 2],
                   fill=(255, 210, 0))
-    d.text((cx, cy + 2), "\u20ac1bn", font=sans_b(10), fill=(255, 255, 255),
-           anchor="mm")
-    # small drone silhouettes
-    for dx, dy in [(0.12, 0.14), (0.82, 0.12)]:
+    # aid crate with cross straps, right side
+    d.rectangle([x + w - 62, y + h - 24, x + w - 18, y + h - 6],
+                fill=(150, 105, 60), outline=(90, 60, 30))
+    d.line([(x + w - 62, y + h - 15), (x + w - 18, y + h - 15)],
+           fill=(90, 60, 30), width=2)
+    d.line([(x + w - 40, y + h - 24), (x + w - 40, y + h - 6)],
+           fill=(90, 60, 30), width=2)
+    d.text((x + w - 52, y + 8), "AID", font=sans_b(9), fill=(90, 60, 30))
+    # small drone silhouettes (kept clear of the AID label)
+    for dx, dy in [(0.62, 0.10), (0.92, 0.22)]:
         px, py = x + dx * w, y + dy * h
         d.ellipse([px - 6, py - 3, px + 6, py + 3], fill=(40, 40, 40))
         d.line([(px - 10, py), (px + 10, py)], fill=(40, 40, 40), width=2)
@@ -575,15 +692,29 @@ CONTINENTS = [
 
 
 def draw_map(d, x, y, w, h):
+    """World map in the dotted style: land is a grid of tan dots on navy,
+    not a solid fill. A mask of the continent polygons decides where dots
+    land, so the shapes stay exact while the texture reads as dotted."""
     d.rectangle([x, y, x + w, y + h], fill=NAVY_D)
     d.rectangle([x, y, x + w, y + h], outline=(120, 140, 175), width=2)
+    # mask of the continents, in map-pixel coordinates
+    mask = Image.new("L", (w, h), 0)
+    md = ImageDraw.Draw(mask)
     for poly in CONTINENTS:
         pts = []
         for lon, lat in poly:
-            px = x + (lon + 180.0) / 360.0 * w
-            py = y + (90.0 - lat) / 180.0 * h
+            px = (lon + 180.0) / 360.0 * w
+            py = (90.0 - lat) / 180.0 * h
             pts.append((px, py))
-        d.polygon(pts, fill=(188, 172, 138), outline=(140, 128, 100))
+        md.polygon(pts, fill=255)
+    # stamp dots on a 7 px grid wherever the mask is set
+    step, r = 7, 2
+    mp = mask.load()
+    for gy in range(step // 2, h, step):
+        for gx in range(step // 2, w, step):
+            if mp[gx, gy]:
+                d.ellipse([x + gx - r, y + gy - r, x + gx + r, y + gy + r],
+                          fill=(200, 186, 152))
     # graticule
     for lon in range(-150, 181, 30):
         gx = x + (lon + 180.0) / 360.0 * w
@@ -635,7 +766,7 @@ def build():
                    serif_i(15), cw, fill=INK, leading=18)
     hline(d, mx, mx + cw, y + 4, fill=INK, width=2)
     hline(d, mx, mx + cw, y + 8, fill=INK, width=1)
-    y += 12
+    y += 10
 
     # stat strip
     bw = (cw - 5 * 4) // 6
@@ -645,7 +776,7 @@ def build():
         d.rectangle([bx, y, bx + 4, y + 44], fill=RED)
         d.text((bx + 10, y + 3), num, font=sans_b(23), fill=RED)
         text_block(d, bx + 10, y + 28, cap, sans(9), bw - 16, fill=GREY, leading=10)
-    y += 52
+    y += 50
 
     # region bar (counts sum to 36)
     total = sum(c for _, c, _ in REGIONS)
@@ -664,11 +795,11 @@ def build():
             d.text((x + seg / 2 - d.textlength(num, font=sans_b(10)) / 2, y + 2),
                    num, font=sans_b(10), fill=(255, 255, 255))
         x += seg
-    y += 22
+    y += 20
 
     # ---- leads: 3 equal columns
     lead_y = y
-    lead_h = 296
+    lead_h = 280
     lw = (cw - 2 * 10) // 3
     img_h = 140
     for i, lead in enumerate(LEADS):
@@ -692,7 +823,7 @@ def build():
         ty = text_block(d, lx, ty, lead["head"], serif_b(18), lw, leading=21)
         ty = text_block(d, lx, ty + 2, lead["body"], sans(11), lw, leading=13)
         d.text((lx, ty + 2), "(" + lead["src"] + ")", font=serif_i(9), fill=GREY)
-    y = lead_y + lead_h + 6
+    y = lead_y + lead_h + 4
 
     # ---- small stories: 2 rows x 5, each with a drawn mini-scene
     cw5 = (cw - 4 * 6) // 5
@@ -726,15 +857,15 @@ def build():
             bs = s["body"] + " (" + s["src"] + ")"
             check_w(d, bs, sans(9), cw5 - 12, f"small {s['n']} body+src")
             d.text((sx + 6, ty + 1), bs, font=sans(9), fill=INK)
-    y += 2 * row_h + 6 + 6
+    y += 2 * row_h + 4 + 4
 
     # ---- bottom band: map (left) + briefs (right)
     d.text((mx, y), "WHERE IT HAPPENED", font=sans_b(12), fill=INK)
     d.text((mx + 482, y), "ALSO ON SATURDAY 21 NOVEMBER  \u2014  23 MORE STORIES",
            font=sans_b(12), fill=INK)
-    y += 18
+    y += 16
     band_y = y
-    band_h = 162
+    band_h = 158
     map_x, map_w = mx, 470
     draw_map(d, map_x, band_y, map_w, band_h)
     d.text((map_x, band_y + band_h + 4), "Pins 1\u201313 mark the drawn stories.",
@@ -751,24 +882,25 @@ def build():
         line = f"{place} \u2014 {head}"  # head already carries its source
         check_w(d, line, sans(9), col_w - 22, f"brief {n}")
         d.text((bx + 22, by), line, font=sans(9), fill=INK)
-    y = band_y + band_h + 18
+    y = band_y + band_h + 14
 
-    # ---- date check
-    dc_text = ("Left out as Friday 20 November's news: Russian missiles landing in "
-               "Poland, Denmark's \u2018assassination plot\u2019 expulsion, the UK\u2013EU reset "
-               "deal, the World Court's Myanmar ruling, the Shenzhen trilateral "
-               "summit, Anthropic's $83-a-share IPO, Cyclone Akvan's landfall, "
-               "Kyiv's bridges hit, the US clearing ~900,000 AI chips for China, "
-               "India's H5N1 vaccine, the Pete Rose pardon, Mongolia's president "
-               "quitting, and GTA VI. The Houthi workshops claim is disputed. "
-               "Not yet happened: BepiColombo's Mercury insertion (Sat 19:24 CET) "
-               "and any final COP31 text.")
-    dc_lines = wrap(d, dc_text, sans(10), cw - 104)
-    dc_h = 8 + len(dc_lines) * 12 + 4
+    # ---- date check: 3-column checklist (✗ + item + its true day)
+    dc_h = 92
     d.rectangle([mx, y, mx + cw, y + dc_h], outline=RED, width=2)
-    d.text((mx + 8, y + 4), "DATE CHECK", font=sans_b(11), fill=RED)
-    text_block(d, mx + 96, y + 4, dc_text, sans(10), cw - 104, leading=12)
-    y += dc_h + 8
+    d.text((mx + 8, y + 5), "DATE CHECK \u2014 WHAT WE LEFT OUT", font=sans_b(11),
+           fill=RED)
+    col_w = (cw - 16) // 3
+    rows = 6
+    for idx, (label, day) in enumerate(DC_ITEMS):
+        col, row = idx // rows, idx % rows
+        ix = mx + 8 + col * col_w
+        iy = y + 22 + row * 11
+        d.text((ix, iy), "\u2717", font=sans_b(9), fill=RED)
+        tx = ix + d.textlength("\u2717 ", font=sans_b(9))
+        d.text((tx, iy), label, font=sans(9), fill=INK)
+        tx += d.textlength(label, font=sans(9))
+        d.text((tx, iy), f" \u2014 {day}", font=sans_b(9), fill=INK)
+    y += dc_h + 6
 
     # ---- footer
     d.text((mx, y), "Every story here happened, or was first reported, on Saturday 21 November 2026. "
