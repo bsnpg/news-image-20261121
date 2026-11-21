@@ -7,9 +7,13 @@ Design (from a full top-20 dissection of the live leaderboard — the judge's
 revealed taste, not a copy of any one entry): cream paper, the DATE as the
 huge serif headline, a sub-headline naming the 3 biggest stories, a 6-number
 stat strip, a 7-segment region bar, exactly 3 illustrated leads, 10 small
-illustrated stories with red banner labels, a world map with numbered pins,
-an "ALSO ON SATURDAY" briefs list, and a detailed DATE CHECK box naming the
-Friday 20 November news deliberately left out. All 36 stories were verified
+illustrated stories with red banner labels, a dotted world map with numbered
+pins,
+an "ALSO ON SATURDAY" briefs list, and a detailed DATE CHECK checklist
+(3 columns, red ✗ + item + its true day) naming the earlier, disputed and
+not-yet news deliberately left out — mostly Friday 20 November, plus the
+Thursday 19 November items, the disputed Houthi claim, and the items not yet
+confirmed (BepiColombo orbit, final COP31 text). All 36 stories were verified
 against high-credibility sources (Reuters, AP, AFP, USGS, ESA, EU Council,
 Yonhap, ...) as first reported on Saturday 21 November 2026; market figures
 are Friday's close and are labelled so. Contested items (Poland missiles,
