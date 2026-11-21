@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
-"""News-image-20261121 entry (Python 3.13, standard library only).
+"""news-image-20261121: place the entry image where the grader expects it.
 
-The entry image is entry.png beside this file. The program copies it to
-/output/entry.png, which is the single image the judge sees. The gate takes
-a whole PNG or JPEG of at most 1 MiB and 1024 by 1024 pixels, and the run
-must be deterministic: the same bytes every time.
-
-Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
+The image is entry.png sitting next to this file. The grader runs this
+program twice and requires both runs to write identical bytes, so the
+program only copies the file — it never redraws, edits, or re-encodes it.
+Run it outside the grader with MAKEFUN_OUTPUT_DIR set to a scratch dir:
   mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
 """
 import os
-import shutil
-from pathlib import Path
 
-src = Path(__file__).resolve().parent / "entry.png"
-out = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")) / "entry.png"
-out.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(src, out)
+
+def main():
+    here = os.path.dirname(os.path.abspath(__file__))
+    image = os.path.join(here, "entry.png")
+    target_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    os.makedirs(target_dir, exist_ok=True)
+    target = os.path.join(target_dir, "entry.png")
+    with open(image, "rb") as src:
+        data = src.read()
+    with open(target, "wb") as dst:
+        dst.write(data)
+
+
+if __name__ == "__main__":
+    main()
